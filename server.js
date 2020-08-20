@@ -15,8 +15,7 @@ const allowCrossDomain = function (req, res, next) {
 app.post("/upload", allowCrossDomain, (req, res) => {
 
   console.log("AAAAA");
-  console.log(req);
-  
+  console.log(req.body);  
   if (req.files === null) {
     return res.status(400).json({ msg: "No file uploaded" });
   }
@@ -33,9 +32,9 @@ app.post("/upload", allowCrossDomain, (req, res) => {
 
 });
 
-// app.get("/upload", allowCrossDomain, (req, res) => {
-//   console.log("BBBBBB");
-//   res.status(200).send('Tudo certo meu chapa!');
-// });
+app.get("/upload", allowCrossDomain, (req, res) => {
+  console.log("BBBBBB")
+  res.status(204).send('Tudo certo meu chapa!');
+});
 
 app.listen(5000, () => console.log("Server started..."));

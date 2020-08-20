@@ -20,6 +20,7 @@ const FileUpload: React.FC = () => {
     target: 'http://localhost:3000/upload',
     chunkSize: 1024 * 1024 * 5,
     maxFiles: 1,
+    query: {importName: "generic name"}
   });
   
   if(!r.support) {
