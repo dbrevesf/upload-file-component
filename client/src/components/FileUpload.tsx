@@ -40,6 +40,16 @@ const FileUpload: React.FC = () => {
         r.on('fileSuccess', (file) => {
           console.log('Success');
         });
+        r.on('progress', () => {
+          console.log(r.progress());
+          const progress = r.progress()*100;
+          if (progress < 100) {
+            setUploadPercentage(progress);
+          } else {
+            setUploadPercentage(progress);
+            setTimeout(() => setUploadPercentage(0), 10000);
+          }
+        })
       }
     }
     if (resumable.current && r.files.length === 0) {
@@ -48,9 +58,7 @@ const FileUpload: React.FC = () => {
       }
     }
     resumable.current = r;
-  }, [importName, uploaderRef, file])
-  
-
+  }, [uploaderRef, importName])
   
 
   const onChangeImportName = (e: any) => {
@@ -62,33 +70,6 @@ const FileUpload: React.FC = () => {
     if (resumable.current) {
       resumable.current.upload();
     }
-    
-    // const formData = new FormData();
-    // formData.append("file", file);
-    // try {
-    //   const res = await axios.post("/upload", formData, {
-    //     headers: {
-    //       "Content-Type": "multipart/form-data",
-    //     },
-    //     onUploadProgress: (progressEvent) => {
-    //       const percentage = Math.round(
-    //         (progressEvent.loaded * 100) / progressEvent.total
-    //       );
-    //       setUploadPercentage(percentage);
-    //       setTimeout(() => setUploadPercentage(0), 10000);
-    //     },
-    //   });
-    //   const { fileName, filePath } = res.data;
-    //   setUploadedFile({ fileName, filePath });
-    //   setMessage("File Uploaded");
-    // } catch (error) {
-    //   setUploadPercentage(0);
-    //   if (error.response.status === 500) {
-    //     setMessage("There was a problem with the server");
-    //   } else {
-    //     setMessage(error.response.data.msg);
-    //   }
-    // }
   };
 
   
