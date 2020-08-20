@@ -26,15 +26,6 @@ app.post("/upload", allowCrossDomain, (req, res) => {
 
   console.log(`${req.body.resumableChunkNumber}/${req.body.resumableTotalChunks}`);  
   res.status(200).send('ok');
-  
-  // const file = req.files.file;
-  // file.mv(`${__dirname}/client/public/uploads/${file.name}`, (err) => {
-  //   if (err) {
-  //     console.error(err);
-  //     return res.status(500).send(err);
-  //   }
-  //   res.json({ fileName: file.name, filePath: `/uploads/${file.name}` });
-  // });
 
 });
 
