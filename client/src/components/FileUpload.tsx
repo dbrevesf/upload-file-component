@@ -13,6 +13,7 @@ const FileUpload: React.FC = () => {
   const [importName, setImportName] = useState('Set an import name. Ex: modeldata');
   const [uploaderRef, setUploaderRef] = useState<HTMLInputElement | null | undefined>();
   const resumable = useRef<Resumable>();
+  type ResumableFile = Resumable.ResumableFile;
 
   useEffect(() => {
     const r = new Resumable({
@@ -21,38 +22,50 @@ const FileUpload: React.FC = () => {
       maxFiles: 1,
       query: {importName: importName}
     });
+
+    const fileAdded = (file: ResumableFile): void => {
+      setFile(file.file);
+      setFileName(file.fileName);
+      console.log('FileAdded');
+    };
+
+    const fileError = (file: ResumableFile, message: string): void => {
+      console.log(file.fileName);
+      console.log(message);
+    }
+
+    const fileSuccess = (file: ResumableFile): void => {
+      console.log('Success');
+    }
+
+    const cleanFields = () => {
+      setUploadPercentage(0);
+    }
+
+    const uploadProgress = () => {
+      console.log(r.progress());
+      const progress = Math.round(r.progress()*100);
+      if (progress < 100) {
+        setUploadPercentage(progress);
+      } else {
+        setUploadPercentage(progress);
+        setTimeout(cleanFields, 10000);
+      }
+    }
     
     if(!r.support) {
       setMessage('Resumable is not installed!');
     } else {    
-      console.log('Rolou');  
       if (uploaderRef) {
         r.assignBrowse(uploaderRef, false);
-        r.on('fileAdded', (file, event) => {
-          setFile(file.file);
-          setFileName(file.fileName);
-          console.log('FileAdded');
-        });
-        r.on('fileError', (file, message) => {
-          console.log(file.fileName);
-          console.log(message);
-        });
-        r.on('fileSuccess', (file) => {
-          console.log('Success');
-        });
-        r.on('progress', () => {
-          console.log(r.progress());
-          const progress = r.progress()*100;
-          if (progress < 100) {
-            setUploadPercentage(progress);
-          } else {
-            setUploadPercentage(progress);
-            setTimeout(() => setUploadPercentage(0), 10000);
-          }
-        })
+        r.on('fileAdded', fileAdded);
+        r.on('fileError', fileError);
+        r.on('fileSuccess', fileSuccess);
+        r.on('progress', uploadProgress);
       }
     }
-    if (resumable.current && r.files.length === 0) {
+    const resumableNeedsFile = resumable.current && r.files.length === 0
+    if (resumableNeedsFile) {
       if (file) {
         r.addFile(file);  
       }

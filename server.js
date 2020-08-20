@@ -11,11 +11,11 @@ const allowCrossDomain = function (req, res, next) {
   next();
 };
 
+
 // Upload Endpoint
 app.post("/upload", allowCrossDomain, (req, res) => {
 
-  console.log("AAAAA");
-  console.log(req.body);  
+  console.log(`${req.body.resumableChunkNumber}/${req.body.resumableTotalChunks}`);  
   res.status(200).send('ok');
   // if (req.files === null) {
   //   return res.status(400).json({ msg: "No file uploaded" });
@@ -33,7 +33,7 @@ app.post("/upload", allowCrossDomain, (req, res) => {
 });
 
 app.get("/upload", allowCrossDomain, (req, res) => {
-  console.log("BBBBBB")
+  console.log(req.query);
   res.status(204).send('Tudo certo meu chapa!');
 });
 
