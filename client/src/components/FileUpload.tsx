@@ -9,8 +9,10 @@ const FileUpload: React.FC = () => {
   const [fileName, setFileName] = useState("Choose File");
   const [uploadedFile, setUploadedFile] = useState({fileName: "",filePath: "",});
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
   const [uploadPercentage, setUploadPercentage] = useState(0);
-  const [importName, setImportName] = useState('Set an import name. Ex: modeldata');
+  const importNameLabel = 'Set an import name. Ex: modeldata'
+  const [importName, setImportName] = useState(importNameLabel);
   const [uploaderRef, setUploaderRef] = useState<HTMLInputElement | null | undefined>();
   const resumable = useRef<Resumable>();
   type ResumableFile = Resumable.ResumableFile;
@@ -26,34 +28,35 @@ const FileUpload: React.FC = () => {
     const fileAdded = (file: ResumableFile): void => {
       setFile(file.file);
       setFileName(file.fileName);
-      console.log('FileAdded');
     };
 
     const fileError = (file: ResumableFile, message: string): void => {
-      console.log(file.fileName);
-      console.log(message);
+      cleanFields();
+      setIsError(true);
+      setMessage(message);
     }
 
     const fileSuccess = (file: ResumableFile): void => {
-      console.log('Success');
+      setIsError(false);
+      setMessage('File was uploaded with success!');
+      setTimeout(cleanFields, 5000);
     }
 
     const cleanFields = () => {
       setUploadPercentage(0);
+      setFile(undefined);
+      setFileName("Choose File");
+      setIsError(false);
+      setMessage('');
     }
 
     const uploadProgress = () => {
-      console.log(r.progress());
       const progress = Math.round(r.progress()*100);
-      if (progress < 100) {
-        setUploadPercentage(progress);
-      } else {
-        setUploadPercentage(progress);
-        setTimeout(cleanFields, 10000);
-      }
+      setUploadPercentage(progress);
     }
     
     if(!r.support) {
+      setIsError(true);
       setMessage('Resumable is not installed!');
     } else {    
       if (uploaderRef) {
@@ -71,7 +74,7 @@ const FileUpload: React.FC = () => {
       }
     }
     resumable.current = r;
-  }, [uploaderRef, importName])
+  }, [uploaderRef, importName, file])
   
 
   const onChangeImportName = (e: any) => {
@@ -81,14 +84,22 @@ const FileUpload: React.FC = () => {
   const onSubmit = async (e: any) => {
     e.preventDefault();
     if (resumable.current) {
-      resumable.current.upload();
+      if (resumable.current.files.length === 0) {
+        setIsError(true);
+        setMessage('No file uploaded');
+      } else {
+        resumable.current.upload();
+      }
+    } else {
+      setIsError(true);
+      setMessage('No file uploaded');
     }
   };
 
   
   return (
     <>
-      {message ? <Message msg={message} /> : null}
+      {message ? <Message msg={message} isError={isError}/> : null}
       <form>
         <div className="custom-file">
           <input
