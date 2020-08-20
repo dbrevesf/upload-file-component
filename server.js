@@ -14,13 +14,19 @@ const allowCrossDomain = function (req, res, next) {
 
 // Upload Endpoint
 app.post("/upload", allowCrossDomain, (req, res) => {
+  
+  if (req.files === null) {
+    res.status(400).send({ msg: "No file uploaded" });
+  }
+
+  console.log(req.body.importName);
+  if (req.body.importName === 'Set an import name. Ex: modeldata') {
+    return res.status(400).send('An import name is required');
+  }
 
   console.log(`${req.body.resumableChunkNumber}/${req.body.resumableTotalChunks}`);  
   res.status(200).send('ok');
-  // if (req.files === null) {
-  //   return res.status(400).json({ msg: "No file uploaded" });
-  // }
-
+  
   // const file = req.files.file;
   // file.mv(`${__dirname}/client/public/uploads/${file.name}`, (err) => {
   //   if (err) {
